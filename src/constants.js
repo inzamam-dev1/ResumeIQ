@@ -1,0 +1,20 @@
+// ─── Target Roles ─────────────────────────────────────────────────────────────
+export const ROLES = [
+  { value: "frontend developer",       label: "Frontend Developer",           icon: "🖥️" },
+  { value: "backend developer",        label: "Backend Developer",            icon: "⚙️" },
+  { value: "full stack developer",     label: "Full Stack Developer",         icon: "🔀" },
+  { value: "web developer",            label: "Web Developer",                icon: "🌐" },
+  { value: "software engineer",        label: "Software Engineer",            icon: "💻" },
+  { value: "mobile developer",         label: "Mobile Developer (iOS/Android)",icon: "📱" },
+  { value: "devops engineer",          label: "DevOps / Cloud Engineer",      icon: "☁️" },
+  { value: "data scientist",           label: "Data Scientist",               icon: "📊" },
+  { value: "machine learning engineer",label: "ML / AI Engineer",             icon: "🤖" },
+  { value: "data engineer",            label: "Data Engineer",                icon: "🗄️" },
+  { value: "product manager",          label: "Product Manager",              icon: "📋" },
+  { value: "ui ux designer",           label: "UI/UX Designer",               icon: "🎨" },
+  { value: "graphic designer",         label: "Graphic Designer",             icon: "✏️" },
+  { value: "cybersecurity engineer",   label: "Cybersecurity Engineer",       icon: "🔐" },
+  { value: "qa engineer",              label: "QA / Test Engineer",           icon: "🧪" },
+  { value: "blockchain developer",     label: "Blockchain Developer",         icon: "⛓️" },
+  { value: "game developer",           label: "Game Developer",               icon: "🎮" },
+];
