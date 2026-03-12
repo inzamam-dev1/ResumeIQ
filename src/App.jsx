@@ -8,6 +8,7 @@ import ScoreRing from "./components/ScoreRing.jsx";
 import SectionBar from "./components/SectionBar.jsx";
 import JobCard from "./components/JobCard.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
+import InterviewTab from "./pages/InterviewTab.jsx";
 import { useAuth } from "./context/AuthContext.jsx";
 
 export default function App() {
@@ -16,33 +17,33 @@ export default function App() {
     logout, canScan, incrementScanCount, upgradeToPremium, downgradeToFree,
   } = useAuth();
 
-  const [page, setPage]           = useState("landing");
+  const [page, setPage] = useState("landing");
   const [activeTab, setActiveTab] = useState("analyze");
 
   // Resume
-  const [inputMode, setInputMode]       = useState("text");
-  const [resumeText, setResumeText]     = useState("");
+  const [inputMode, setInputMode] = useState("text");
+  const [resumeText, setResumeText] = useState("");
   const [uploadedFile, setUploadedFile] = useState(null);
-  const [dragOver, setDragOver]         = useState(false);
-  const [targetRole, setTargetRole]     = useState("software engineer");
-  const [analysis, setAnalysis]         = useState(null);
-  const [analyzing, setAnalyzing]       = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const [targetRole, setTargetRole] = useState("software engineer");
+  const [analysis, setAnalysis] = useState(null);
+  const [analyzing, setAnalyzing] = useState(false);
   const [analyzeError, setAnalyzeError] = useState("");
 
   // Editor
-  const [editedResume, setEditedResume]             = useState("");
-  const [originalResume, setOriginalResume]         = useState("");
-  const [editorView, setEditorView]                 = useState("edit");
-  const [applyingIdx, setApplyingIdx]               = useState(null);
-  const [rewriting, setRewriting]                   = useState(false);
+  const [editedResume, setEditedResume] = useState("");
+  const [originalResume, setOriginalResume] = useState("");
+  const [editorView, setEditorView] = useState("edit");
+  const [applyingIdx, setApplyingIdx] = useState(null);
+  const [rewriting, setRewriting] = useState(false);
   const [appliedSuggestions, setAppliedSuggestions] = useState([]);
-  const [copySuccess, setCopySuccess]               = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
 
   // Jobs
-  const [jobs, setJobs]               = useState([]);
+  const [jobs, setJobs] = useState([]);
   const [jobsLoading, setJobsLoading] = useState(false);
-  const [jobsError, setJobsError]     = useState("");
-  const [jobsRole, setJobsRole]       = useState("software engineer");
+  const [jobsError, setJobsError] = useState("");
+  const [jobsRole, setJobsRole] = useState("software engineer");
   const [jobsFetched, setJobsFetched] = useState(false);
 
   const fileRef = useRef();
@@ -93,8 +94,8 @@ export default function App() {
     setJobsLoading(false);
   };
 
-  const roleLabel    = ROLES.find(r => r.value === targetRole)?.label || targetRole;
-  const jobRoleLabel = ROLES.find(r => r.value === jobsRole)?.label   || jobsRole;
+  const roleLabel = ROLES.find(r => r.value === targetRole)?.label || targetRole;
+  const jobRoleLabel = ROLES.find(r => r.value === jobsRole)?.label || jobsRole;
 
   // ── Spinner ───────────────────────────────────────────────────────────────
   const Spin = ({ dark } = {}) => (
@@ -103,11 +104,12 @@ export default function App() {
 
   // ── Bottom nav config ─────────────────────────────────────────────────────
   const NAV_TABS = [
-    { id: "analyze",  icon: "🎯", label: "Analyze" },
-    { id: "results",  icon: "📊", label: "Results" },
-    { id: "editor",   icon: "✏️", label: "Editor" },
-    { id: "jobs",     icon: "💼", label: "Jobs" },
-    { id: "upgrade",  icon: plan === "premium" ? "⭐" : "🔓", label: plan === "premium" ? "Premium" : "Upgrade" },
+    { id: "analyze", icon: "🎯", label: "Analyze" },
+    { id: "results", icon: "📊", label: "Results" },
+    { id: "editor", icon: "✏️", label: "Editor" },
+    { id: "jobs", icon: "💼", label: "Jobs" },
+    { id: "interview", icon: "🎤", label: "Interview" },
+    { id: "upgrade", icon: plan === "premium" ? "⭐" : "🔓", label: plan === "premium" ? "Premium" : "Upgrade" },
   ];
 
   // ── Auth loading ──────────────────────────────────────────────────────────
@@ -156,12 +158,12 @@ export default function App() {
 
       <div className="features-grid">
         {[
-          { icon: "📎", title: "Upload or Paste",   desc: "PDF, DOC, TXT or paste text", free: true },
-          { icon: "🎯", title: "AI Resume Score",   desc: "0–100 score + grade", free: true },
+          { icon: "📎", title: "Upload or Paste", desc: "PDF, DOC, TXT or paste text", free: true },
+          { icon: "🎯", title: "AI Resume Score", desc: "0–100 score + grade", free: true },
           { icon: "✨", title: "Smart Suggestions", desc: "Tailored for your role", free: true },
-          { icon: "🌐", title: "Live Job Search",   desc: "Real listings by AI", free: "3 searches" },
-          { icon: "✏️", title: "Resume Editor",     desc: "AI fixes one by one", free: true },
-          { icon: "♾️", title: "Unlimited Scans",   desc: "No monthly limits", premium: true },
+          { icon: "🌐", title: "Live Job Search", desc: "Real listings by AI", free: "3 searches" },
+          { icon: "✏️", title: "Resume Editor", desc: "AI fixes one by one", free: true },
+          { icon: "♾️", title: "Unlimited Scans", desc: "No monthly limits", premium: true },
         ].map(f => (
           <div key={f.title} style={{ ...S.card, padding: 16, position: "relative" }}>
             {f.premium && <div style={{ position: "absolute", top: 10, right: 10, ...S.chip("#F59E0B"), fontSize: 9, padding: "2px 8px" }}>PRO</div>}
@@ -586,6 +588,10 @@ export default function App() {
               </>
             )}
           </div>
+        )}
+
+        {activeTab === "interview" && (
+          <InterviewTab plan={plan} onUpgrade={() => setActiveTab("upgrade")} />
         )}
 
         {/* ── UPGRADE TAB ─────────────────────────────────────────────────── */}

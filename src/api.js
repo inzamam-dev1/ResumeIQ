@@ -259,3 +259,90 @@ function timeAgo(dateStr) {
   if (days < 30)  return `${Math.floor(days / 7)}w ago`;
   return `${Math.floor(days / 30)}mo ago`;
 }
+// ── Interview AI ──────────────────────────────────────────────────────────────
+export async function sendInterviewMessage(messages, maxTokens = 1000) {
+  if (!GROQ_KEY) throw new Error("Groq API key missing.");
+  const res = await fetch(GROQ_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${GROQ_KEY}`,
+    },
+    body: JSON.stringify({
+      model: "llama-3.1-8b-instant",
+      messages,
+      temperature: 0.7,
+      max_tokens: maxTokens,
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `HTTP ${res.status}`);
+  }
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || "";
+}
+
+export function buildInterviewSystemPrompt(role, mode, totalQuestions) {
+  if (mode === "english") {
+    return `You are a friendly English communication coach conducting a practice session.
+Ask ONE question at a time. After each answer give feedback in this EXACT format:
+
+FEEDBACK:
+Score: X/10
+✓ Good: [what they did well — grammar, vocabulary, fluency]
+✗ Improve: [specific grammar or vocabulary issues]
+💡 Better phrasing: [more natural/professional way to say it]
+
+NEXT_QUESTION:
+[your next question here]
+
+Be encouraging and supportive. After ${totalQuestions} questions write SESSION_COMPLETE.
+Start by greeting warmly and asking about their background.`;
+  }
+
+  return `You are a senior technical interviewer at a top tech company for a ${role} position.
+Ask ONE technical question at a time. After each answer give feedback in this EXACT format:
+
+FEEDBACK:
+Score: X/10
+✓ Good: [what they got right]
+✗ Missing: [important points they missed]
+💡 Better answer: [the ideal answer or key points]
+
+NEXT_QUESTION:
+[your next question here]
+
+Be professional but encouraging. After ${totalQuestions} questions write SESSION_COMPLETE and give a full report.
+Start by greeting and asking your first question.`;
+}
+
+export async function generateSessionReport(messages, role, mode) {
+  const transcript = messages
+    .filter(m => m.role !== "system")
+    .map(m => `${m.role === "user" ? "Candidate" : "Interviewer"}: ${m.content}`)
+    .join("\n\n");
+
+  return await askGroq(`
+Based on this ${mode === "english" ? "English communication practice" : `${role} technical interview`} session, generate a performance report.
+
+Return ONLY valid JSON, no markdown fences:
+{
+  "overallScore": <integer 0-100>,
+  "grade": "<A+ or A or B+ or B or C or D>",
+  "summary": "<2 honest sentences about overall performance>",
+  "scores": {
+    "technicalKnowledge": <0-100>,
+    "communication": <0-100>,
+    "problemSolving": <0-100>,
+    "confidence": <0-100>
+  },
+  "strengths": ["<strength 1>", "<strength 2>"],
+  "improvements": ["<improvement 1>", "<improvement 2>", "<improvement 3>"],
+  "studyTopics": ["<topic 1>", "<topic 2>", "<topic 3>"]
+}
+
+Transcript:
+${transcript.substring(0, 3000)}
+`, 1000);
+}
